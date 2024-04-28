@@ -41,3 +41,4 @@ local_filename = "order_extract.csv"
 with open(local_filename, 'w', newline='') as fp:
     csv_w = csv.writer(fp, delimiter='|')
     csv_w.writerows(result)
+    
