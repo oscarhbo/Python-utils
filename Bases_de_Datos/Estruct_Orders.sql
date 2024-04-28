@@ -1,5 +1,5 @@
 -------------------------------
---  MYSQL
+--  MYSQL, POSTGRES
 -------------------------------
 CREATE TABLE ORDERS (
 ORDERID        INT,
