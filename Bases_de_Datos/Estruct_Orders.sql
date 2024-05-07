@@ -23,6 +23,9 @@ INSERT INTO ORDERS
 VALUES (3,'Enviada', '2023-07-12 12:00:00');
 
 
+INSERT INTO ORDERS
+VALUES (4,'Enviada', '2024-05-05 12:34:12');
+
 -------------------------------
 --  ORACLE
 -------------------------------
