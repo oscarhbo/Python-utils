@@ -27,4 +27,4 @@ def leer_parquet(ruta_archivo_parquet):
         print(f" [Error] al leer archivo parquet - {str(e)}")    
 
 
-leer_parquet(rutaBase + "ejemplo_emp.parquet" )
+leer_parquet(rutaBase + "ejemplo_emp.snappy.parquet" )

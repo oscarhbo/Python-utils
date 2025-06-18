@@ -36,12 +36,14 @@ def ConvertCsvToParquet(ruta_archivo_csv,   ruta_archivo_parquet):
 
         print(df.head())
 
-        df.to_parquet(ruta_archivo_parquet, engine='pyarrow', index=False)
+        #df.to_parquet(ruta_archivo_parquet, engine='pyarrow', index=False)
+        df.to_parquet(ruta_archivo_parquet, engine='pyarrow', compression='snappy', index=False)
+
 
     except Exception as e:
         print(f"Error al leer el archivo: {str(e)}" )    
 
     
-ConvertCsvToParquet(rutaBase + "ejemplo_emp.csv",  rutaBase + "ejemplo_emp.parquet")
+ConvertCsvToParquet(rutaBase + "ejemplo_emp.csv",  rutaBase + "ejemplo_emp.snappy.parquet")
 
 
