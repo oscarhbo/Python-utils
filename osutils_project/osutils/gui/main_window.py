@@ -4,6 +4,7 @@ from osutils.gui.descarga import DescargarPaqueteFrame
 from osutils.gui.sqlloader import SQLLoaderFrame
 from osutils.gui.respaldo_alianza import RespaldoAlianzaFrame
 from osutils.gui.descargar_consultas import DescargarConsultasFrame
+from osutils.gui.preparar_archivo_datos import PrepararArchivoDatosFrame
 
 class App(ctk.CTk):
     def __init__(self):
@@ -23,7 +24,8 @@ class App(ctk.CTk):
         self.menu_options = [
             ("🔌 Probar conexión", self.show_conexion_frame),
             ("📦 Descargar paquete", self.show_descarga_frame),
-            ("🧩 SQL*Loader", self.show_sqlloader_frame),  
+            ("🧩 SQL*Loader", self.show_sqlloader_frame),
+            ("📝 Preparar archivo de Datos", self.show_preparar_archivo_datos_frame),
             ("📁 Respaldo Alianza", self.show_respaldo_alianza_frame),
             ("📁 Descargar Consultas", self.show_descargar_consultas_frame),
             ("📁 Respaldo PPR", self.show_under_construction),
@@ -95,6 +97,11 @@ class App(ctk.CTk):
     def show_sqlloader_frame(self):
         self.clear_main_frame()
         self.current_frame = SQLLoaderFrame(self.main_frame)
+        self.current_frame.pack(expand=True, fill="both")
+
+    def show_preparar_archivo_datos_frame(self):
+        self.clear_main_frame()
+        self.current_frame = PrepararArchivoDatosFrame(self.main_frame)
         self.current_frame.pack(expand=True, fill="both")
 
     def show_respaldo_alianza_frame(self):
