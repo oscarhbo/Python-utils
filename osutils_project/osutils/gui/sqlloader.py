@@ -5,10 +5,16 @@ import os
 import threading
 import subprocess
 from osutils.gui.conexion import SelectorConexionOracle
+import sys
+
+def get_base_path():
+    if getattr(sys, 'frozen', False):
+        return os.path.dirname(sys.executable)
+    else:
+        return os.path.dirname(os.path.abspath(sys.argv[0]))
 
 # Ajuste: obtener la ruta absoluta del INI en la raíz del proyecto
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-SQLLOADER_CONFIG_PATH = os.path.join(PROJECT_ROOT, "sqlloader_config.ini")
+SQLLOADER_CONFIG_PATH = os.path.join(get_base_path(), "sqlloader_config.ini")
 
 class SQLLoaderFrame(ctk.CTkFrame):
     def __init__(self, master):
@@ -54,11 +60,11 @@ class SQLLoaderFrame(ctk.CTkFrame):
         if os.path.exists(SQLLOADER_CONFIG_PATH):
             config = configparser.ConfigParser()
             config.read(SQLLOADER_CONFIG_PATH)
-            return config.get("SQLLOADER", "path", fallback="")
+            return config.get("SQLLOADER", "sqlloader_path", fallback="")
         return ""
     def guardar_ruta_sqlloader(self, path):
         config = configparser.ConfigParser()
-        config["SQLLOADER"] = {"path": path}
+        config["SQLLOADER"] = {"sqlloader_path": path}
         with open(SQLLOADER_CONFIG_PATH, "w") as f:
             config.write(f)
     def seleccionar_ruta_sqlloader(self):
@@ -113,6 +119,20 @@ class SQLLoaderFrame(ctk.CTkFrame):
             f"control={ctl_path}",
             f"log={log_path}"
         ]
+        # --- Ajuste para variables de entorno desde el INI ---
+        env = os.environ.copy()
+        sqlloader_ini = SQLLOADER_CONFIG_PATH
+        if os.path.exists(sqlloader_ini):
+            config_ini = configparser.ConfigParser()
+            config_ini.read(sqlloader_ini)
+            if 'SQLLOADER' in config_ini:
+                if 'ORACLE_HOME' in config_ini['SQLLOADER']:
+                    env['ORACLE_HOME'] = config_ini['SQLLOADER']['ORACLE_HOME']
+                if 'PATH' in config_ini['SQLLOADER']:
+                    env['PATH'] = config_ini['SQLLOADER']['PATH'] + ';' + env.get('PATH', '')
+                if 'NLS_LANG' in config_ini['SQLLOADER']:
+                    env['NLS_LANG'] = config_ini['SQLLOADER']['NLS_LANG']
+        # --- Fin ajuste ---
         def run_sqlloader():
             try:
                 proc = subprocess.Popen(
@@ -121,7 +141,8 @@ class SQLLoaderFrame(ctk.CTkFrame):
                     stderr=subprocess.STDOUT,
                     text=True,
                     bufsize=1,
-                    cwd=os.path.dirname(ctl_path)
+                    cwd=os.path.dirname(ctl_path),
+                    env=env
                 )
                 for line in proc.stdout:
                     self.texto_avance.insert("end", line)

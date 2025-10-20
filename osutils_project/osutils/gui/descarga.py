@@ -98,7 +98,7 @@ class DescargarPaqueteFrame(ctk.CTkFrame):
         try:
             connection = self.selector.connect()
             codigo = obtener_paquete_oracle(nombre_paquete, connection)
-            with open(ruta_salida, "w", encoding="utf-8") as f:
+            with open(ruta_salida, "w", encoding="ansi") as f:
                 f.write(codigo)
             self.mensaje.configure(text=f"✅ Paquete {nombre_paquete} guardado correctamente")
             connection.close()

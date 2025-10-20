@@ -6,8 +6,13 @@ from tkinter import messagebox
 from osutils.db.oracle import OracleConnectionManager
 
 
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-INI_PATH = os.path.join(PROJECT_ROOT, "db_connections.ini")
+def get_base_path():
+    if getattr(sys, 'frozen', False):
+        return os.path.dirname(sys.executable)
+    else:
+        return os.path.dirname(os.path.abspath(sys.argv[0]))
+
+INI_PATH = os.path.join(get_base_path(), "db_connections.ini")
 
 class SelectorConexionOracle(ctk.CTkFrame):
     def __init__(self, master, config_ini_path=INI_PATH, on_change=None, bg_color=None):
