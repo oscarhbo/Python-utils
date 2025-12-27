@@ -5,6 +5,7 @@ from osutils.gui.sqlloader import SQLLoaderFrame
 from osutils.gui.respaldo_alianza import RespaldoAlianzaFrame
 from osutils.gui.descargar_consultas import DescargarConsultasFrame
 from osutils.gui.preparar_archivo_datos import PrepararArchivoDatosFrame
+from osutils.gui.respaldo_ppr import RespaldoPPRFrame
 
 class App(ctk.CTk):
     def __init__(self):
@@ -28,7 +29,7 @@ class App(ctk.CTk):
             ("📝 Preparar archivo de Datos", self.show_preparar_archivo_datos_frame),
             ("📁 Respaldo Alianza", self.show_respaldo_alianza_frame),
             ("📁 Descargar Consultas", self.show_descargar_consultas_frame),
-            ("📁 Respaldo PPR", self.show_under_construction),
+            ("📁 Respaldo PPR", self.show_respaldo_ppr_frame),
         ]
 
         for texto, comando in self.menu_options:
@@ -112,4 +113,9 @@ class App(ctk.CTk):
     def show_descargar_consultas_frame(self):
         self.clear_main_frame()
         self.current_frame = DescargarConsultasFrame(self.main_frame)
+        self.current_frame.pack(expand=True, fill="both")
+
+    def show_respaldo_ppr_frame(self):
+        self.clear_main_frame()
+        self.current_frame = RespaldoPPRFrame(self.main_frame)
         self.current_frame.pack(expand=True, fill="both")
