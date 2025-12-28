@@ -179,7 +179,7 @@ class RespaldoAlianzaFrame(ctk.CTkFrame):
                 deletes.append("PROMPT |------------------------------------------------------------------------------------------------|")
                 deletes.append(f"PROMPT | ELIMINANDO TABLA [{tabla}]  ALIANZA ({codalianza})")
                 deletes.append("PROMPT |------------------------------------------------------------------------------------------------|\n")
-                delete_sql = f"DELETE FROM {tabla} WHERE CODALIANZA = '{codalianza}';\n/\n"
+                delete_sql = f"DELETE FROM {tabla} WHERE CODALIANZA = '{codalianza}'\n/\n"
                 deletes.append(delete_sql)
             deletes.append("PROMPT |------------------------------------------------------------------------------------------------|")
             deletes.append(f"PROMPT |            FINALIZÓ  REVERSO ALIANZA ({codalianza} - {descalianza})")
