@@ -118,14 +118,27 @@ class RespaldoPPRFrame(ctk.CTkFrame):
                 inserts.append("PROMPT |------------------------------------------------------------------------------------------------|")
                 inserts.append(f"PROMPT |                     INSERTANDO TABLA [{tabla}]  PPR ({ppr})")
                 inserts.append("PROMPT |------------------------------------------------------------------------------------------------|\n")
+                # Obtener columnas PK para ORDER BY
+                cursor.execute("""
+                    SELECT cols.column_name
+                    FROM all_constraints cons, all_cons_columns cols
+                    WHERE cons.constraint_type = 'P'
+                      AND cons.owner = 'GORAPR'
+                      AND cons.table_name = :1
+                      AND cons.constraint_name = cols.constraint_name
+                      AND cons.owner = cols.owner
+                    ORDER BY cols.position
+                """, [tabla])
+                pk_cols = [row[0] for row in cursor.fetchall()]
+                order_by = f" ORDER BY {', '.join(pk_cols)}" if pk_cols else ""
                 # --- Lógica especial para LVAL ---
                 if tabla == "LVAL" and ("TIPOLVAL" in params or "CODLVAL_FMT" in params):
                     tipolval = params.get("TIPOLVAL", "CRITRESE")
                     codlval_fmt = params.get("CODLVAL_FMT", "{CODPROD}{CODPLAN}{REVPLAN}")
                     codlval = codlval_fmt.replace("{CODPROD}", codprod).replace("{CODPLAN}", codplan).replace("{REVPLAN}", revplan)
-                    cursor.execute(f"SELECT * FROM GORAPR.LVAL WHERE TIPOLVAL=:1 AND CODLVAL=:2", [tipolval, codlval])
+                    cursor.execute(f"SELECT * FROM GORAPR.LVAL WHERE TIPOLVAL=:1 AND CODLVAL=:2{order_by}", [tipolval, codlval])
                 else:
-                    cursor.execute(f"SELECT * FROM GORAPR.{tabla} WHERE CODPROD=:1 AND CODPLAN=:2 AND REVPLAN=:3", [codprod, codplan, revplan])
+                    cursor.execute(f"SELECT * FROM GORAPR.{tabla} WHERE CODPROD=:1 AND CODPLAN=:2 AND REVPLAN=:3{order_by}", [codprod, codplan, revplan])
                 def quote_column(col):
                     reserved = {'DEFAULT', 'SELECT', 'FROM', 'WHERE', 'ORDER', 'GROUP', 'TABLE', 'INSERT', 'UPDATE', 'DELETE'}
                     return f'"{col}"' if col.upper() in reserved else col
@@ -260,15 +273,28 @@ class RespaldoPPRFrame(ctk.CTkFrame):
                         tabla = tabla_info["tabla"] if isinstance(tabla_info, dict) else tabla_info
                         params = tabla_info["params"] if isinstance(tabla_info, dict) else {}
                         inserts_ws.append("PROMPT |------------------------------------------------------------------------------------------------|")
-                        inserts_ws.append(f"PROMPT |                     INSERTANDO TABLA [{tabla}]  WS_{{ppr}}")
+                        inserts_ws.append(f"PROMPT |                     INSERTANDO TABLA [{tabla}]  WS_{ppr}")
                         inserts_ws.append("PROMPT |------------------------------------------------------------------------------------------------|\n")
+                        # Obtener columnas PK para ORDER BY
+                        cursor.execute("""
+                            SELECT cols.column_name
+                            FROM all_constraints cons, all_cons_columns cols
+                            WHERE cons.constraint_type = 'P'
+                              AND cons.owner = 'GORAPR'
+                              AND cons.table_name = :1
+                              AND cons.constraint_name = cols.constraint_name
+                              AND cons.owner = cols.owner
+                            ORDER BY cols.position
+                        """, [tabla])
+                        pk_cols = [row[0] for row in cursor.fetchall()]
+                        order_by = f" ORDER BY {', '.join(pk_cols)}" if pk_cols else ""
                         if tabla == "LVAL" and ("TIPOLVAL" in params or "CODLVAL_FMT" in params):
                             tipolval = params.get("TIPOLVAL", "CRITRESE")
                             codlval_fmt = params.get("CODLVAL_FMT", "{CODPROD}{CODPLAN}{REVPLAN}")
                             codlval = codlval_fmt.replace("{CODPROD}", codprod).replace("{CODPLAN}", codplan).replace("{REVPLAN}", revplan)
-                            cursor.execute(f"SELECT * FROM GORAPR.LVAL WHERE TIPOLVAL=:1 AND CODLVAL=:2", [tipolval, codlval])
+                            cursor.execute(f"SELECT * FROM GORAPR.LVAL WHERE TIPOLVAL=:1 AND CODLVAL=:2{order_by}", [tipolval, codlval])
                         else:
-                            cursor.execute(f"SELECT * FROM GORAPR.{tabla} WHERE CODPROD=:1 AND CODPLAN=:2 AND REVPLAN=:3", [codprod, codplan, revplan])
+                            cursor.execute(f"SELECT * FROM GORAPR.{tabla} WHERE CODPROD=:1 AND CODPLAN=:2 AND REVPLAN=:3{order_by}", [codprod, codplan, revplan])
                         def quote_column(col):
                             reserved = {'DEFAULT', 'SELECT', 'FROM', 'WHERE', 'ORDER', 'GROUP', 'TABLE', 'INSERT', 'UPDATE', 'DELETE'}
                             return f'"{col}"' if col.upper() in reserved else col
@@ -307,7 +333,7 @@ class RespaldoPPRFrame(ctk.CTkFrame):
                             insert_sql = f"INSERT INTO {tabla}\n       (" + ",".join(columns) + ")\nVALUES (" + ",".join(values) + ")\n/\n"
                             inserts_ws.append(insert_sql)
                         inserts_ws.append("PROMPT |------------------------------------------------------------------------------------------------|")
-                        inserts_ws.append(f"PROMPT |                     FINALIZÓ INSERTS TABLA [{tabla}]  WS_{{ppr}}")
+                        inserts_ws.append(f"PROMPT |                     FINALIZÓ INSERTS TABLA [{tabla}]  WS_{ppr}")
                         inserts_ws.append("PROMPT |------------------------------------------------------------------------------------------------|\n")
                     inserts_ws.append("PROMPT |------------------------------------------------------------------------------------------------|")
                     inserts_ws.append(f"PROMPT |                  FINALIZÓ  AMBIENTACIÓN WS_{ppr}")
@@ -321,7 +347,7 @@ class RespaldoPPRFrame(ctk.CTkFrame):
                         tabla = tabla_info["tabla"] if isinstance(tabla_info, dict) else tabla_info
                         params = tabla_info["params"] if isinstance(tabla_info, dict) else {}
                         deletes_ws.append("PROMPT |------------------------------------------------------------------------------------------------|")
-                        deletes_ws.append(f"PROMPT |                     ELIMINANDO TABLA [{tabla}]  WS_{{ppr}}")
+                        deletes_ws.append(f"PROMPT |                     ELIMINANDO TABLA [{tabla}]  WS_{ppr}")
                         deletes_ws.append("PROMPT |------------------------------------------------------------------------------------------------|\n")
                         if tabla == "LVAL" and ("TIPOLVAL" in params or "CODLVAL_FMT" in params):
                             tipolval = params.get("TIPOLVAL", "CRITRESE")
